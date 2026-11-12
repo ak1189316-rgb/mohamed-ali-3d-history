@@ -23,6 +23,9 @@
     .figma-card:hover { transform: translateY(-5px); box-shadow: 0 20px 35px -10px rgba(124, 58, 237, 0.15); }
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .camera-view-button { min-width: 62px; color: #cbd5e1; background: transparent; }
+    .camera-view-button.is-active { color: #fff; background: #7c3aed; box-shadow: 0 2px 10px rgba(124,58,237,.35); }
+    .camera-view-button:focus-visible { outline: 2px solid #c4b5fd; outline-offset: 2px; }
   </style>
 </head>
 <body class="text-slate-800 antialiased selection:bg-purple-600 selection:text-white">
@@ -102,7 +105,7 @@
           شاهد وتفاعل مع محمد علي باشا وشخصيات التاريخ 3D وهي تتحدث فوق الفيديو!
         </h2>
         <p class="text-indigo-100/90 text-xs sm:text-base leading-relaxed font-semibold">
-          اضغط على أي شخصية لتفتح أمامك مجسمة بالكامل ثلاثية الأبعاد (3D)، تستطيع تدويرها، قلبها وتشقلبها 360°، والتحدث معها، مع مشاهدة فيديو الدرس من اليوتيوب أسفلها مباشرة.
+          اضغط على أي شخصية لتفتح أمامك مجسمة بالكامل ثلاثية الأبعاد (3D)، تستطيع تدويرها 360°، والتحدث معها، مع مشاهدة فيديو الدرس من اليوتيوب أسفلها مباشرة.
         </p>
       </div>
 
@@ -129,7 +132,7 @@
               </span>
             </div>
             <p class="text-xs text-slate-500 font-bold mt-0.5">
-              حرك ودوّر المجسم 360°، تشقلب، وتحدث مع الشخصية، ثم شاهد الفيديو التعليمي بالأسفل 👇
+              حرّك المجسم وتحدث مع الشخصية، ثم شاهد الفيديو التعليمي بالأسفل 👇
             </p>
           </div>
         </div>
@@ -160,13 +163,13 @@
 
           <!-- أزرار زوايا الكاميرا -->
           <div class="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-md p-1 rounded-xl border border-slate-700/60 text-xs">
-            <button onclick="setCameraView('face')" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 font-bold transition-colors">
+            <button type="button" data-camera-view="face" aria-pressed="false" onclick="setCameraView('face')" class="camera-view-button px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 font-bold transition-colors">
               👤 الوجه
             </button>
-            <button onclick="setCameraView('body')" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 font-bold transition-colors">
+            <button type="button" data-camera-view="body" aria-pressed="true" onclick="setCameraView('body')" class="camera-view-button is-active px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 font-bold transition-colors">
               🧍 كامل
             </button>
-            <button onclick="setCameraView('top')" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 font-bold transition-colors">
+            <button type="button" data-camera-view="top" aria-pressed="false" onclick="setCameraView('top')" class="camera-view-button px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 font-bold transition-colors">
               📐 علوي
             </button>
           </div>
@@ -194,14 +197,11 @@
           <!-- شريط التحكم السفلي المدمج للمجسم 3D -->
           <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 w-auto max-w-[95%]">
             <div class="flex items-center gap-1.5 sm:gap-2 bg-slate-900/90 backdrop-blur-md px-3 sm:px-4 py-2 rounded-2xl border border-slate-700/80 shadow-2xl">
-              <button onclick="rotateCharacter(Math.PI / 6)" class="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-purple-600 text-white font-bold text-xs transition-all active:scale-95 shadow-sm">
-                <span>🔄</span><span>لف يمين</span>
+              <button onclick="rotateCharacter(Math.PI / 6)" class="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-purple-600 text-white font-bold text-xs transition-all active:scale-95 shadow-sm" aria-label="لف الشخصية يمينًا">
+                <span>🔄</span><span>يمين</span>
               </button>
-              <button onclick="rotateCharacter(-Math.PI / 6)" class="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-purple-600 text-white font-bold text-xs transition-all active:scale-95 shadow-sm">
-                <span>🔁</span><span>لف يسار</span>
-              </button>
-              <button onclick="triggerFlip()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-xs transition-all active:scale-95 shadow-md">
-                <span class="text-sm">🤸‍♂️</span><span>تشقلب 360°</span>
+              <button onclick="rotateCharacter(-Math.PI / 6)" class="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-purple-600 text-white font-bold text-xs transition-all active:scale-95 shadow-sm" aria-label="لف الشخصية يسارًا">
+                <span>🔁</span><span>يسار</span>
               </button>
               <button onclick="resetCamera()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs transition-all">
                 🎯 ضبط
@@ -237,9 +237,6 @@
             <div class="space-y-1.5">
               <span class="text-[11px] font-bold text-slate-400">حركات وتعبيرات الشخصية:</span>
               <div class="grid grid-cols-2 gap-2">
-                <button onclick="triggerFlip()" class="p-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-transform">
-                  <span>🤸‍♂️</span><span>تشقلب 360°</span>
-                </button>
                 <button onclick="triggerSalute()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 active:scale-95 transition-transform">
                   <span>🫡</span><span>تحية ملكية</span>
                 </button>
@@ -338,7 +335,7 @@
           <div class="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-900 group">
             <img src="https://img.youtube.com/vi/3Zyx_UoyBoc/hqdefault.jpg" alt="محمد علي باشا" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-80" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-3">
-              <div class="self-end bg-purple-600/90 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg">🔄 تدوير وتشقلب 360°</div>
+              <div class="self-end bg-purple-600/90 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg">🔄 تدوير 360°</div>
               <div class="flex items-center justify-center">
                 <div class="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center text-xl shadow-lg">▶</div>
               </div>
@@ -374,7 +371,7 @@
           <div class="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-900 group">
             <img src="https://img.youtube.com/vi/6GFgMp6uIro/hqdefault.jpg" alt="السلطان سليم الأول" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-80" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-3">
-              <div class="self-end bg-purple-600/90 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg">🔄 تدوير وتشقلب 360°</div>
+              <div class="self-end bg-purple-600/90 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg">🔄 تدوير 360°</div>
               <div class="flex items-center justify-center">
                 <div class="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center text-xl shadow-lg">▶</div>
               </div>
@@ -410,7 +407,7 @@
           <div class="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-900 group">
             <img src="https://img.youtube.com/vi/QJ3EIl0bIFQ/hqdefault.jpg" alt="نابليون بونابرت" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-80" />
             <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-3">
-              <div class="self-end bg-purple-600/90 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg">🔄 تدوير وتشقلب 360°</div>
+              <div class="self-end bg-purple-600/90 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg">🔄 تدوير 360°</div>
               <div class="flex items-center justify-center">
                 <div class="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center text-xl shadow-lg">▶</div>
               </div>
@@ -532,36 +529,23 @@
 
     let currentFigureId = 'mohamed-ali';
     let isSpeaking = false;
-    let isFlipping = false;
-    let flipProgress = 0;
     let currentSpeechText = charactersData['mohamed-ali'].mainSpeech;
+    let characterHeight = 3;
+    let visualModel = null;
+    let visualModelBaseScale = 1;
+    let visualModelBaseY = 0;
+    let speechAudio = null;
+    const geminiTtsCache = new Map();
+    let speechRequestId = 0;
+    // ضع رابط Web App المنشور من Google Apps Script هنا بعد الإعداد.
+    const GEMINI_TTS_ENDPOINT = '';
 
     // متغيرات Three.js
     let scene, camera, renderer, controls;
     let charGroup, jawMesh, headGroup, rightArmGroup;
 
-    // مؤثرات صوتية فيزيائية برمجية
+    // مؤثر صوتي بسيط للخطاب
     let audioCtx = null;
-    function playWhoosh() {
-      try {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-        const now = audioCtx.currentTime;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.frequency.setValueAtTime(150, now);
-        osc.frequency.exponentialRampToValueAtTime(700, now + 0.15);
-        osc.frequency.exponentialRampToValueAtTime(80, now + 0.45);
-        gain.gain.setValueAtTime(0.01, now);
-        gain.gain.linearRampToValueAtTime(0.2, now + 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now);
-        osc.stop(now + 0.46);
-      } catch (e) {}
-    }
-
     function playFanfare() {
       try {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -664,6 +648,15 @@
           charGroup.position.y = Math.sin(elapsedTime * 2) * 0.015;
         }
 
+        // المجسم الأصلي جسم ثابت بلا عظام تحريك؛ نضيف تنفسًا وميلًا خفيفًا أثناء الصوت.
+        if (visualModel) {
+          const talking = isSpeaking ? 1 : 0;
+          const pulse = Math.sin(elapsedTime * 8.5);
+          visualModel.position.y = visualModelBaseY + (talking ? Math.abs(pulse) * 0.018 : 0);
+          visualModel.rotation.z = talking ? Math.sin(elapsedTime * 2.1) * 0.012 : visualModel.rotation.z * 0.9;
+          visualModel.scale.setScalar(visualModelBaseScale * (1 + talking * Math.abs(pulse) * 0.003));
+        }
+
         // حركة الفم والأيدي أثناء الكلام
         if (isSpeaking) {
           if (jawMesh) {
@@ -683,20 +676,8 @@
             headGroup.rotation.x *= 0.9;
             headGroup.rotation.y *= 0.9;
           }
-          if (rightArmGroup && !isFlipping) {
+          if (rightArmGroup) {
             rightArmGroup.rotation.x *= 0.9;
-          }
-        }
-
-        // حركة الشقلبة 360°
-        if (isFlipping && charGroup) {
-          flipProgress += delta * 2.8;
-          charGroup.rotation.x = flipProgress * Math.PI * 2;
-          charGroup.position.y = Math.sin(flipProgress * Math.PI) * 0.65;
-          if (flipProgress >= 1) {
-            isFlipping = false;
-            charGroup.rotation.x = 0;
-            charGroup.position.y = 0;
           }
         }
 
@@ -718,6 +699,7 @@
       charGroup = new THREE.Group();
       scene.add(charGroup);
       jawMesh = headGroup = rightArmGroup = null;
+      visualModel = null;
       const loadingMessage = document.getElementById('modelLoadingMessage');
       if (loadingMessage) { loadingMessage.style.display = 'flex'; loadingMessage.textContent = 'جارٍ تحميل مجسم محمد علي باشا...'; }
       new THREE.GLTFLoader().load('./mohamed-ali-optimized.glb', (gltf) => {
@@ -726,9 +708,13 @@
         const size = bounds.getSize(new THREE.Vector3());
         const center = bounds.getCenter(new THREE.Vector3());
         const scale = 3 / (Math.max(size.x, size.y, size.z) || 1);
+        characterHeight = Math.max(1, size.y * scale);
         model.scale.setScalar(scale);
         model.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
         model.traverse((node) => { if (node.isMesh) { node.castShadow = true; node.receiveShadow = true; } });
+        visualModel = model;
+        visualModelBaseScale = scale;
+        visualModelBaseY = model.position.y;
         charGroup.add(model);
         if (loadingMessage) loadingMessage.style.display = 'none';
         resetCamera();
@@ -748,14 +734,6 @@
       controls.update();
     }
 
-    function triggerFlip() {
-      if (!isFlipping) {
-        isFlipping = true;
-        flipProgress = 0;
-        playWhoosh();
-      }
-    }
-
     function triggerSalute() {
       if (!charGroup) return;
       const start = charGroup.rotation.z;
@@ -772,66 +750,116 @@
 
     function resetCamera() {
       if (camera && controls) {
-        camera.position.set(0, 1.35, 4.2);
-        controls.target.set(0, 1.05, 0);
+        const centerY = characterHeight * 0.5;
+        camera.position.set(0, centerY, characterHeight * 1.85);
+        controls.target.set(0, centerY, 0);
         controls.update();
       }
       if (charGroup) charGroup.rotation.set(0, 0, 0);
+      updateCameraButtonState('body');
     }
 
     function setCameraView(view) {
       if (!camera || !controls) return;
+      const centerY = characterHeight * 0.5;
       if (view === 'face') {
-        camera.position.set(0, 1.62, 1.9);
-        controls.target.set(0, 1.58, 0);
+        const faceY = characterHeight * 0.89;
+        camera.position.set(0, faceY, characterHeight * 0.72);
+        controls.target.set(0, faceY, 0);
       } else if (view === 'body') {
-        camera.position.set(0, 1.35, 4.2);
-        controls.target.set(0, 1.05, 0);
+        camera.position.set(0, centerY, characterHeight * 1.85);
+        controls.target.set(0, centerY, 0);
       } else if (view === 'top') {
-        camera.position.set(0, 3.8, 2.5);
-        controls.target.set(0, 1.05, 0);
+        camera.position.set(0, characterHeight * 1.95, 0.12);
+        controls.target.set(0, centerY, 0);
       }
       controls.update();
+      updateCameraButtonState(view);
     }
 
-    // الصوت والكلام (Web Speech API)
+    function updateCameraButtonState(activeView) {
+      document.querySelectorAll('[data-camera-view]').forEach((button) => {
+        const active = button.dataset.cameraView === activeView;
+        button.classList.toggle('is-active', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    }
+
+    // الصوت والكلام: Gemini TTS عند ضبط رابط Apps Script، وصوت المتصفح كبديل تلقائي.
+    function setSpeakingUI(active, message) {
+      isSpeaking = active;
+      document.getElementById('speakingIndicatorDot').classList.toggle('animate-ping', active);
+      document.getElementById('speakingIndicatorText').innerText = message || (active ? 'يتحدث الآن...' : 'صوت الشخصية التاريخية');
+      document.getElementById('btnPlayVoice').innerText = active ? '⏸' : '▶';
+    }
+
     function stopSpeech() {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
-      isSpeaking = false;
-      document.getElementById('speakingIndicatorDot').classList.remove('animate-ping');
-      document.getElementById('speakingIndicatorText').innerText = 'صوت الشخصية التاريخية';
-      document.getElementById('btnPlayVoice').innerText = '▶';
+      speechRequestId++;
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+      if (speechAudio) { speechAudio.pause(); speechAudio.currentTime = 0; speechAudio = null; }
+      setSpeakingUI(false);
     }
 
-    function playSpeech(text) {
+    function playBrowserSpeech(text) {
+      if (!('speechSynthesis' in window)) {
+        setSpeakingUI(false, 'الصوت غير متاح في هذا المتصفح');
+        return;
+      }
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ar-EG';
+      utterance.rate = 0.95;
+      utterance.onstart = () => setSpeakingUI(true, 'يتحدث الآن...');
+      utterance.onend = utterance.onerror = () => setSpeakingUI(false);
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function requestGeminiAudio(text) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `geminiTtsCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const script = document.createElement('script');
+        const timer = setTimeout(() => finish(new Error('انتهت مهلة طلب الصوت')), 60000);
+        function finish(error, result) {
+          clearTimeout(timer);
+          delete window[callbackName];
+          script.remove();
+          error ? reject(error) : resolve(result);
+        }
+        window[callbackName] = (result) => result && result.error ? finish(new Error(result.error)) : finish(null, result);
+        script.onerror = () => finish(new Error('تعذر الاتصال بخدمة الصوت'));
+        script.src = `${GEMINI_TTS_ENDPOINT}${GEMINI_TTS_ENDPOINT.includes('?') ? '&' : '?'}text=${encodeURIComponent(text)}&callback=${callbackName}`;
+        document.head.appendChild(script);
+      });
+    }
+
+    async function playSpeech(text) {
       stopSpeech();
+      const requestId = speechRequestId;
       currentSpeechText = text;
       document.getElementById('speechBubbleText').innerText = `"${text}"`;
-
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = 'ar-SA';
-        utterance.rate = 1.0;
-        
-        utterance.onstart = () => {
-          isSpeaking = true;
-          document.getElementById('speakingIndicatorDot').classList.add('animate-ping');
-          document.getElementById('speakingIndicatorText').innerText = 'يتحدث الآن...';
-          document.getElementById('btnPlayVoice').innerText = '⏸';
-        };
-
-        utterance.onend = utterance.onerror = () => {
-          stopSpeech();
-        };
-
-        window.speechSynthesis.speak(utterance);
-      } else {
-        isSpeaking = true;
-        document.getElementById('btnPlayVoice').innerText = '⏸';
-        setTimeout(stopSpeech, 6000);
+      if (!GEMINI_TTS_ENDPOINT) { playBrowserSpeech(text); return; }
+      const cached = geminiTtsCache.get(text);
+      if (cached) { playAudioData(cached); return; }
+      setSpeakingUI(true, 'جارٍ تجهيز الصوت الاحترافي...');
+      try {
+        const result = await requestGeminiAudio(text);
+        if (requestId !== speechRequestId) return;
+        if (!result || !result.audio) throw new Error('لم يصل ملف الصوت من الخدمة');
+        geminiTtsCache.set(text, result);
+        playAudioData(result);
+      } catch (error) {
+        if (requestId !== speechRequestId) return;
+        console.error('Gemini TTS:', error);
+        setSpeakingUI(false, 'تعذر صوت Gemini؛ جارٍ استخدام الصوت البديل');
+        playBrowserSpeech(text);
       }
+    }
+
+    function playAudioData(result) {
+      stopSpeech();
+      speechAudio = new Audio(`data:${result.mimeType || 'audio/wav'};base64,${result.audio}`);
+      speechAudio.onplay = () => setSpeakingUI(true, 'يتحدث الآن بصوت Gemini');
+      speechAudio.onended = speechAudio.onerror = () => setSpeakingUI(false);
+      speechAudio.play().catch((error) => { console.error(error); setSpeakingUI(false, 'اضغط تشغيل للسماح بالصوت'); });
     }
 
     function togglePlaySpeech() {
@@ -977,3 +1005,4 @@
   </script>
 </body>
 </html>
+
