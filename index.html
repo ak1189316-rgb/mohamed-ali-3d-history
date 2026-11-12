@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>محاكاة الشخصيات التاريخية 3D التفاعلية - مركز المستكشف الرقمي</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- مكتبات التصميم، التحريك 3D، والاحتفال -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.4/dist/confetti.browser.min.js"></script>
+
+  <style>
+    * { font-family: 'Cairo', sans-serif; box-sizing: border-box; }
+    body { background-color: #F4F7FB; margin: 0; padding: 0; min-height: 100vh; }
+    .figma-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05); }
+    .figma-card:hover { transform: translateY(-5px); box-shadow: 0 20px 35px -10px rgba(124, 58, 237, 0.15); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="text-slate-800 antialiased selection:bg-purple-600 selection:text-white">
+
+  <!-- ==================== الترويسة والشعارات المعتمدة ==================== -->
+  <header class="w-full bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-1 flex justify-start">
+      <span class="text-[11px] text-slate-500 font-bold">مركز المستكشف الرقمي</span>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
+      
+      <!-- اليمين: اللوجو المعتمد لمركز تعلم الدراسات الاجتماعية / جامعة أسوان -->
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="flex flex-col items-center shrink-0">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 relative flex items-center justify-center shrink-0">
+            <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-2xs">
+              <circle cx="56" cy="46" r="34" fill="#F59E0B" opacity="0.95" />
+              <path d="M 56 6 L 61 14 L 70 8 L 72 18 L 82 15 L 81 25 L 90 25 L 86 35 L 94 38 L 87 47 L 94 52 L 85 58 L 89 68 L 79 70 L 80 80 L 70 78 L 67 87 L 58 82 L 53 90 L 47 82" fill="none" stroke="#D97706" stroke-width="2.5" />
+              <circle cx="44" cy="52" r="32" fill="#2563EB" stroke="#1D4ED8" stroke-width="2" />
+              <ellipse cx="44" cy="52" rx="32" ry="12" fill="none" stroke="#FFFFFF" stroke-width="1.8" opacity="0.85" />
+              <line x1="12" y1="52" x2="76" y2="52" stroke="#FFFFFF" stroke-width="2" opacity="0.9" />
+              <ellipse cx="44" cy="52" rx="14" ry="32" fill="none" stroke="#FFFFFF" stroke-width="1.8" opacity="0.85" />
+              <line x1="44" y1="20" x2="44" y2="84" stroke="#FFFFFF" stroke-width="2" opacity="0.9" />
+              <g transform="translate(42, 42)">
+                <polygon points="0,-18 26,-7 0,4 -26,-7" fill="#0F172A" stroke="#334155" stroke-width="1.5" />
+                <path d="M -13,-4 L -13,7 C -13,14 13,14 13,7 L 13,-4 Z" fill="#1E293B" />
+                <circle cx="0" cy="-7" r="2.8" fill="#F59E0B" />
+                <path d="M 0,-7 Q -18,-5 -22,12" fill="none" stroke="#F59E0B" stroke-width="2" stroke-linecap="round" />
+                <polygon points="-24,12 -20,12 -19,20 -25,20" fill="#F59E0B" />
+              </g>
+              <g transform="translate(44, 76)">
+                <path d="M -16,-3 Q 0,-7 0,2 Q 0,-7 16,-3 L 16,8 Q 0,4 0,12 Q 0,4 -16,8 Z" fill="#FFFFFF" stroke="#0F172A" stroke-width="1.2" />
+                <line x1="0" y1="2" x2="0" y2="12" stroke="#0F172A" stroke-width="1.2" />
+              </g>
+            </svg>
+          </div>
+          <span class="text-[8.5px] font-black text-slate-800 leading-tight mt-0.5 tracking-tighter">
+            مركز تعلم الدراسات الاجتماعية
+          </span>
+        </div>
+      </div>
+
+      <!-- المركز: اسم القسم والعنوان الفرعي -->
+      <div class="text-center flex-1 px-1 sm:px-2">
+        <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
+          محاكاة الشخصيات التاريخية 3D
+        </h1>
+        <p class="text-purple-600 font-bold text-xs sm:text-sm mt-0.5">
+          مجسمات ثلاثية الأبعاد ناطقة وتفاعلية فوق الفيديوهات - الصف الثالث الإعدادي
+        </p>
+      </div>
+
+      <!-- الشمال: زر الصفحة الرئيسية -->
+      <div class="flex items-center gap-2 shrink-0">
+        <a href="https://sites.google.com/view/test4thc/%D8%A7%D9%84%D8%B5%D9%81%D8%AD%D8%A9-%D8%A7%D9%84%D8%B1%D8%A6%D9%8A%D8%B3%D9%8A%D8%A9" target="_blank" rel="noopener noreferrer" class="flex items-center gap-1.5 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-slate-100 hover:bg-purple-50 text-slate-800 hover:text-purple-700 font-black text-xs sm:text-sm transition-all shadow-2xs border border-slate-200/80">
+          <span>الرئيسية</span>
+          <span class="text-sm sm:text-base">🏠</span>
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== المحتوى الرئيسي ==================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-8">
+
+    <!-- البانر الترحيبي -->
+    <section class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-r from-[#0F172A] via-[#1E1B4B] to-[#312E81] text-white shadow-2xl p-6 sm:p-10 flex flex-col-reverse md:flex-row items-center justify-between gap-6 border border-indigo-900/40">
+      <div class="absolute -left-20 -top-20 w-64 h-64 bg-purple-500 opacity-15 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex-1 text-center md:text-right space-y-3 z-10 max-w-2xl">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-xs font-bold text-purple-200">
+          <span>🤖 شخصيات 3D ناطقة وتفاعلية بالكامل</span>
+        </div>
+        <h2 class="text-2xl sm:text-4xl font-black text-white leading-tight">
+          شاهد وتفاعل مع محمد علي باشا وشخصيات التاريخ 3D وهي تتحدث فوق الفيديو!
+        </h2>
+        <p class="text-indigo-100/90 text-xs sm:text-base leading-relaxed font-semibold">
+          اضغط على أي شخصية لتفتح أمامك مجسمة بالكامل ثلاثية الأبعاد (3D)، تستطيع تدويرها، قلبها وتشقلبها 360°، والتحدث معها، مع مشاهدة فيديو الدرس من اليوتيوب أسفلها مباشرة.
+        </p>
+      </div>
+
+      <div class="relative z-10 shrink-0 w-28 h-28 sm:w-36 sm:h-36 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 flex flex-col items-center justify-center text-4xl sm:text-5xl shadow-xl">
+        <span>👑</span>
+        <span class="text-[10px] font-black text-purple-200 mt-1">مجسم 3D</span>
+      </div>
+    </section>
+
+    <!-- مسرح المجسم 3D التفاعلي (موجود مباشرة فوق الفيديو) -->
+    <section id="stage-section" class="space-y-4 pt-2">
+      <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-purple-600 text-white flex items-center justify-center text-xl shadow-md">
+            📦
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 id="activeCharacterTitle" class="text-lg sm:text-xl font-black text-slate-900">
+                الشخصية ثلاثية الأبعاد (3D): محمد علي باشا
+              </h2>
+              <span id="activeCharacterEra" class="text-xs bg-purple-100 text-purple-800 font-bold px-2 py-0.5 rounded-md">
+                تاريخ مصر الحديث
+              </span>
+            </div>
+            <p class="text-xs text-slate-500 font-bold mt-0.5">
+              حرك ودوّر المجسم 360°، تشقلب، وتحدث مع الشخصية، ثم شاهد الفيديو التعليمي بالأسفل 👇
+            </p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 shrink-0">
+          <span class="text-[11px] font-black text-slate-400">الشخصية:</span>
+          <span class="px-3 py-1.5 rounded-xl text-xs font-black bg-purple-600 text-white shadow-sm flex items-center gap-1"><span>👑</span><span>محمد علي باشا</span></span>
+        </div>      </div>
+
+      <!-- حاوية الـ 3D والتحكم -->
+      <div class="relative w-full h-[540px] sm:h-[620px] rounded-3xl overflow-hidden shadow-2xl border border-slate-700/50 bg-slate-950 flex flex-col md:flex-row">
+        
+        <!-- الكانفاس 3D -->
+        <div class="relative flex-1 h-[340px] md:h-full w-full">
+          <div id="threeCanvasContainer" class="w-full h-full cursor-grab active:cursor-grabbing"></div>
+          <div id="modelLoadingMessage" class="absolute inset-0 z-10 flex items-center justify-center text-white/80 text-sm font-bold pointer-events-none">جارٍ تحميل مجسم محمد علي باشا...</div>
+
+          <!-- شارة الشخصية المعروضة -->
+          <div class="absolute top-4 right-1/2 translate-x-1/2 md:translate-x-0 md:right-4 z-20 pointer-events-none text-center md:text-right">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/90 border border-purple-500/30 text-white shadow-lg backdrop-blur-md">
+              <span id="charIconBadge" class="text-base">👑</span>
+              <span id="charNameBadge" class="font-extrabold text-xs sm:text-sm text-purple-200">محمد علي باشا</span>
+              <span id="charPeriodBadge" class="text-[10px] text-amber-400 font-bold bg-amber-400/10 px-2 py-0.5 rounded-md border border-amber-400/20">
+                1805 - 1848م
+              </span>
+            </div>
+          </div>
+
+          <!-- أزرار زوايا الكاميرا -->
+          <div class="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-md p-1 rounded-xl border border-slate-700/60 text-xs">
+            <button onclick="setCameraView('face')" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 font-bold transition-colors">
+              👤 الوجه
+            </button>
+            <button onclick="setCameraView('body')" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 font-bold transition-colors">
+              🧍 كامل
+            </button>
+            <button onclick="setCameraView('top')" class="px-2.5 py-1 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 font-bold transition-colors">
+              📐 علوي
+            </button>
+          </div>
+
+          <!-- فقاعة كلام الشخصية الناطقة -->
+          <div class="absolute bottom-16 sm:bottom-20 left-4 right-4 md:left-6 md:right-auto md:max-w-md z-20 pointer-events-auto">
+            <div class="bg-slate-900/95 backdrop-blur-md border border-purple-500/40 rounded-2xl p-3.5 shadow-2xl space-y-2">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span id="speakingIndicatorDot" class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+                  <span id="speakingIndicatorText" class="text-xs font-black text-purple-300">صوت الشخصية التاريخية</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button id="btnPlayVoice" onclick="togglePlaySpeech()" class="p-1.5 rounded-lg bg-purple-600/30 hover:bg-purple-600 text-purple-200 hover:text-white transition-colors" title="تشغيل / إيقاف">
+                    ▶
+                  </button>
+                </div>
+              </div>
+              <p id="speechBubbleText" class="text-xs sm:text-sm text-slate-100 font-semibold leading-relaxed max-h-24 overflow-y-auto no-scrollbar">
+                "مرحباً بكم يا أبنائي وبناتي طلاب الصف الثالث الإعدادي. أنا محمد علي باشا، مؤسس مصر الحديثة..."
+              </p>
+            </div>
+          </div>
+
+          <!-- شريط التحكم السفلي المدمج للمجسم 3D -->
+          <div class="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 w-auto max-w-[95%]">
+            <div class="flex items-center gap-1.5 sm:gap-2 bg-slate-900/90 backdrop-blur-md px-3 sm:px-4 py-2 rounded-2xl border border-slate-700/80 shadow-2xl">
+              <button onclick="rotateCharacter(Math.PI / 6)" class="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-purple-600 text-white font-bold text-xs transition-all active:scale-95 shadow-sm">
+                <span>🔄</span><span>لف يمين</span>
+              </button>
+              <button onclick="rotateCharacter(-Math.PI / 6)" class="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-purple-600 text-white font-bold text-xs transition-all active:scale-95 shadow-sm">
+                <span>🔁</span><span>لف يسار</span>
+              </button>
+              <button onclick="triggerFlip()" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black text-xs transition-all active:scale-95 shadow-md">
+                <span class="text-sm">🤸‍♂️</span><span>تشقلب 360°</span>
+              </button>
+              <button onclick="resetCamera()" class="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs transition-all">
+                🎯 ضبط
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- اللوحة الجانبية للحوار والأسئلة -->
+        <div class="w-full md:w-80 lg:w-96 bg-slate-900/95 border-t md:border-t-0 md:border-r border-slate-800 p-4 sm:p-5 flex flex-col justify-between overflow-y-auto no-scrollbar z-20">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="text-purple-400 text-base">💬</span>
+                <h4 id="panelTitle" class="text-sm font-extrabold text-white">حوار وتفاعل مع محمد علي باشا</h4>
+              </div>
+              <span class="text-[10px] bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded-full font-bold">تفاعل 3D ذكي</span>
+            </div>
+
+            <!-- زر الخطاب التاريخي الرئيسي -->
+            <button onclick="playMainSpeech()" class="w-full text-right p-3 rounded-2xl border bg-purple-600 text-white border-purple-400 shadow-lg transition-all flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2.5">
+                <span class="text-lg">📢</span>
+                <div>
+                  <div class="text-xs font-black">الخطاب التاريخي الرسمي</div>
+                  <div id="panelSpeechSummary" class="text-[10px] text-purple-100 line-clamp-1">خطاب ثورة الشعب وبناء النهضة الكبرى</div>
+                </div>
+              </div>
+              <span class="text-xs font-bold shrink-0">استمع</span>
+            </button>
+
+            <!-- حركات إضافية -->
+            <div class="space-y-1.5">
+              <span class="text-[11px] font-bold text-slate-400">حركات وتعبيرات الشخصية:</span>
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="triggerFlip()" class="p-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white font-extrabold text-xs flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition-transform">
+                  <span>🤸‍♂️</span><span>تشقلب 360°</span>
+                </button>
+                <button onclick="triggerSalute()" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 border border-slate-700 active:scale-95 transition-transform">
+                  <span>🫡</span><span>تحية ملكية</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- أسئلة المنهج -->
+            <div class="space-y-2">
+              <span class="text-[11px] font-bold text-slate-400">اسأل الشخصية من منهج الدراسات:</span>
+              <div id="questionsContainer" class="space-y-2"></div>
+            </div>
+          </div>
+
+          <div class="pt-4 border-t border-slate-800 space-y-2">
+            <a href="#video-section" class="w-full py-2.5 px-4 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-extrabold text-xs flex items-center justify-center gap-2 shadow-lg transition-all">
+              <span>انزل لمشاهدة فيديو اليوتيوب بالأسفل</span>
+              <span>↓</span>
+            </a>
+            <p class="text-[10px] text-center text-slate-400">
+              المجسم 3D يتفاعل بالكامل ويتحرك أثناء مشاهدتك
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- قسم فيديو اليوتيوب التعليمي بالأسفل -->
+    <section id="video-section" class="w-full space-y-6 pt-4">
+      <div class="bg-white rounded-3xl border border-slate-200/80 shadow-md p-5 sm:p-7 space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-xs font-black text-purple-700 mb-2">
+              <span>📺 فيديو تعليمي معتمد</span>
+              <span>·</span>
+              <span>الصف الثالث الإعدادي</span>
+            </div>
+            <h3 id="videoTitleDisplay" class="text-xl sm:text-2xl font-black text-slate-900">محمد علي باشا وبناء الدولة الحديثة</h3>
+            <p id="videoSubDisplay" class="text-xs sm:text-sm text-slate-500 font-semibold mt-1">مؤسس مصر الحديثة يروي قصة بناء الجيش والتعليم والتنظيم الإداري.</p>
+          </div>
+
+          <a href="#stage-section" class="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-100 hover:bg-purple-50 text-slate-700 hover:text-purple-700 font-black text-xs transition-all border border-slate-200 shrink-0">
+            <span>↑</span>
+            <span>الرجوع للشخصية 3D بالأعلى</span>
+          </a>
+        </div>
+
+        <div class="relative w-full aspect-video rounded-2xl overflow-hidden bg-slate-950 shadow-xl border border-slate-800">
+          <iframe id="videoIframe" src="https://www.youtube.com/embed/3Zyx_UoyBoc" title="مشغل الفيديو" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+
+        <!-- ملخص نقاط المنهج -->
+        <div class="pt-4 space-y-3">
+          <h4 class="text-sm font-black text-slate-900 flex items-center gap-2">
+            <span>📖</span>
+            <span>أهم نقاط الدرس المقررة في المنهج المدرسي:</span>
+          </h4>
+          <div id="notesContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+        </div>
+
+        <!-- أسئلة اختبر فهمك -->
+        <div class="pt-6 border-t border-slate-100 space-y-4">
+          <h4 class="text-sm font-black text-slate-900 flex items-center gap-2">
+            <span>❓</span>
+            <span>اختبر فهمك بعد مشاهدة المجسم 3D والفيديو:</span>
+          </h4>
+          <div id="quizContainer" class="space-y-4"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- شريط التصفية حسَب العصور التاريخية وشبكة البطاقات -->
+    <div class="flex items-center justify-between flex-wrap gap-4 bg-white p-3 sm:p-4 rounded-2xl border border-slate-200/80 shadow-2xs">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-black text-slate-700">تصفية حسب العصر:</span>
+        <div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs font-bold">
+          <button onclick="filterEra('all')" id="filter-all" class="filter-btn px-3.5 py-1.5 rounded-xl bg-purple-600 text-white shadow-xs">الكل</button>
+          <button onclick="filterEra('modern')" id="filter-modern" class="filter-btn px-3.5 py-1.5 rounded-xl text-slate-600 hover:bg-slate-100">تاريخ مصر الحديث</button>
+          <button onclick="filterEra('ottoman')" id="filter-ottoman" class="filter-btn px-3.5 py-1.5 rounded-xl text-slate-600 hover:bg-slate-100">العصر العثماني والمماليك</button>
+        </div>
+      </div>
+      <span class="text-xs font-bold text-slate-400">إجمالي الشخصيات: 3 شخصيات</span>
+    </div>
+
+    <!-- شبكة بطاقات الشخصيات الثلاث -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <!-- بطاقة 1: محمد علي باشا -->
+      <div onclick="switchCharacter('mohamed-ali')" class="card-item modern bg-white rounded-[2rem] border border-slate-100 hover:border-purple-300 figma-card overflow-hidden flex flex-col justify-between p-6 cursor-pointer">
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-purple-50 text-purple-700 border border-purple-100">مجسم 3D ناطق</span>
+            <span class="text-2xl">👑</span>
+          </div>
+
+          <div class="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-900 group">
+            <img src="https://img.youtube.com/vi/3Zyx_UoyBoc/hqdefault.jpg" alt="محمد علي باشا" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-80" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-3">
+              <div class="self-end bg-purple-600/90 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg">🔄 تدوير وتشقلب 360°</div>
+              <div class="flex items-center justify-center">
+                <div class="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center text-xl shadow-lg">▶</div>
+              </div>
+              <div class="text-[11px] text-purple-200 font-bold">اضغط لفتح الشخصية 3D فوق الفيديو</div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-extrabold text-slate-900">محمد علي باشا</h3>
+            <p class="text-xs font-bold text-purple-600 mt-0.5">مؤسس مصر الحديثة (1805 - 1848م)</p>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+              يتحدث عن توليه الحكم بناءً على إرادة الشعب المصري، وكيف قام ببناء الجيش والدولة الحديثة وتطوير الزراعة والصناعة.
+            </p>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between">
+          <button class="flex items-center gap-2 text-xs font-extrabold text-purple-700">
+            <span>تفاعل مع مجسم 3D وشاهد الفيديو</span>
+            <span class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-xs">←</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- بطاقة 2: السلطان سليم الأول -->
+      <div onclick="switchCharacter('selim-first')" class="card-item ottoman bg-white rounded-[2rem] border border-slate-100 hover:border-purple-300 figma-card overflow-hidden flex flex-col justify-between p-6 cursor-pointer">
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-purple-50 text-purple-700 border border-purple-100">مجسم 3D ناطق</span>
+            <span class="text-2xl">🕌</span>
+          </div>
+
+          <div class="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-900 group">
+            <img src="https://img.youtube.com/vi/6GFgMp6uIro/hqdefault.jpg" alt="السلطان سليم الأول" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-80" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-3">
+              <div class="self-end bg-purple-600/90 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg">🔄 تدوير وتشقلب 360°</div>
+              <div class="flex items-center justify-center">
+                <div class="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center text-xl shadow-lg">▶</div>
+              </div>
+              <div class="text-[11px] text-purple-200 font-bold">اضغط لفتح الشخصية 3D فوق الفيديو</div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-extrabold text-slate-900">السلطان سليم الأول</h3>
+            <p class="text-xs font-bold text-purple-600 mt-0.5">توسع العثمانيين في الشرق (1512 - 1520م)</p>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+              يشرح أسباب اتجاهه بنفوذه نحو الشرق، وموقعة مرج دابق والريدانية وانتهاء دولة المماليك وتحول مصر لولاية عثمانية.
+            </p>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between">
+          <button class="flex items-center gap-2 text-xs font-extrabold text-purple-700">
+            <span>تفاعل مع مجسم 3D وشاهد الفيديو</span>
+            <span class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-xs">←</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- بطاقة 3: نابليون بونابرت -->
+      <div onclick="switchCharacter('napoleon')" class="card-item modern bg-white rounded-[2rem] border border-slate-100 hover:border-purple-300 figma-card overflow-hidden flex flex-col justify-between p-6 cursor-pointer">
+        <div class="space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="px-3 py-1 rounded-full text-xs font-extrabold bg-purple-50 text-purple-700 border border-purple-100">مجسم 3D ناطق</span>
+            <span class="text-2xl">⚔️</span>
+          </div>
+
+          <div class="relative w-full h-44 rounded-2xl overflow-hidden bg-slate-900 group">
+            <img src="https://img.youtube.com/vi/QJ3EIl0bIFQ/hqdefault.jpg" alt="نابليون بونابرت" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 opacity-80" />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex flex-col justify-between p-3">
+              <div class="self-end bg-purple-600/90 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-lg">🔄 تدوير وتشقلب 360°</div>
+              <div class="flex items-center justify-center">
+                <div class="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center text-xl shadow-lg">▶</div>
+              </div>
+              <div class="text-[11px] text-purple-200 font-bold">اضغط لفتح الشخصية 3D فوق الفيديو</div>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-extrabold text-slate-900">نابليون بونابرت</h3>
+            <p class="text-xs font-bold text-purple-600 mt-0.5">قائد الحملة الفرنسية على مصر (1798 - 1799م)</p>
+            <p class="text-xs text-slate-500 mt-2 leading-relaxed">
+              يتحدث عن دوافع الحملة الفرنسية على مصر، ومعركة إمبابة، وتأسيس المجمع العلمي، واكتشاف حجر رشيد ونتائج الحملة.
+            </p>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 mt-4 flex items-center justify-between">
+          <button class="flex items-center gap-2 text-xs font-extrabold text-purple-700">
+            <span>تفاعل مع مجسم 3D وشاهد الفيديو</span>
+            <span class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-xs">←</span>
+          </button>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==================== الفوتر ==================== -->
+  <footer class="bg-white border-t border-slate-200 mt-12 py-8 text-center text-xs font-semibold text-slate-500 space-y-1">
+    <p class="font-extrabold text-slate-800 text-sm">مركز تعلم الدراسات الاجتماعية · الصف الثالث الإعدادي</p>
+    <p class="text-xs text-slate-500">تصميم وإعداد: طلاب الفرقة الرابعة - قسم تكنولوجيا التعليم | جامعة أسوان</p>
+    <p class="text-[11px] text-slate-400">جميع الحقوق محفوظة © مركز المستكشف الرقمي</p>
+  </footer>
+
+  <!-- ==================== سكريبتات 3D والكلام والتفاعل ==================== -->
+  <script>
+    // بيانات الشخصيات والمنهج المدرسي
+    const charactersData = {
+      'mohamed-ali': {
+        name: 'محمد علي باشا',
+        title: 'مؤسس مصر الحديثة',
+        period: '1805 - 1848م',
+        era: 'تاريخ مصر الحديث',
+        icon: '👑',
+        videoUrl: 'https://www.youtube.com/embed/3Zyx_UoyBoc',
+        videoTitle: 'محمد علي باشا وبناء الدولة الحديثة',
+        videoSub: 'مؤسس مصر الحديثة يروي قصة بناء الجيش والتعليم والتنظيم الإداري.',
+        mainSpeech: 'مرحباً بكم يا أبنائي وبناتي طلاب الصف الثالث الإعدادي. أنا محمد علي باشا، مؤسس مصر الحديثة. حين اختارني زعماء الشعب في دار المحكمة يوم 13 مايو عام 1805م، عاهدتكم أن أجعل مصر دولة قوية مهيبة. بنيت جيشاً وطنياً نظامياً، وأنشأت القناطر الخيرية لتطوير الري، وشيدت المدارس الحديثة مثل الطب والهندسة وأرسلت البعثات التعليمية إلى أوروبا.',
+        speechSummary: 'خطاب ثورة الشعب وبناء النهضة الكبرى',
+        dialogues: [
+          { q: 'كيف قمت ببناء الجيش المصري الحديث؟', a: 'أدركت أن الجيش هو الدعامة الأساسية لتحقيق أهدافي. أنشأت مدرسة عسكرية في أسوان لتدريب الضباط بقيادة الكولونيل سيف، واستقدمت خبراء من فرنسا، كما أنشأت الترسانة البحرية في بولاق ثم الإسكندرية لصناعة السفن الحربية والأسلحة.' },
+          { q: 'ما هو نظام الاحتكار ولماذا طبقته؟', a: 'طبقت نظام الاحتكار في الاقتصاد لأضمن الدخول في سوق التجارة الدولية منافساً لغيري من الدول. كانت الحكومة تحدد نوع الغلات التي تزرع والمصنوعات التي تنتج وأثمان شرائها وبيعها.' },
+          { q: 'ما دورك في نهضة التعليم والثقافة؟', a: 'أنشأت المدارس العالية كالطب والمهندسخانة والزراعة، وأرسلت البعثات إلى فرنسا وإيطاليا وكان على رأسهم رفاعة الطهطاوي وعلي مبارك، وأسست مطبعة بولاق الأميرية وأصدرت صحيفة الوقائع المصرية.' }
+        ],
+        notes: [
+          { title: 'ثورة الشعب وتولية الحكم', year: '1805م', detail: 'اجتمع زعماء الشعب في دار المحكمة (بيت القاضي) وقرروا عزل خورشيد باشا وتعيين محمد علي بإرادة شعبية.' },
+          { title: 'مذبحة القلعة والتخلص من المماليك', year: '1811م', detail: 'تخلص محمد علي من المماليك لينفرد بحكم مصر تماماً ويبدأ في تنفيذ مشروعه النهضوي بدون منازعين.' },
+          { title: 'مشروع القناطر الخيرية', year: '1835م', detail: 'أعظم مشروعات الري التي حولت أراضي الوجه البحري من ري الحياض إلى الري الدائم لزراعة القطن.' },
+          { title: 'فرمانا 1841م', year: '1841م', detail: 'أصدر السلطان العثماني فرمانين بحق وراثة حكم مصر لأكبر أبناء محمد علي الذكور سناً، وإدارة السودان.' }
+        ],
+        quiz: [
+          { q: 'في أي مكان اجتمع زعماء الشعب المصري لتولية محمد علي حكم مصر عام 1805م؟', options: ['جامع الأزهر الشريف', 'دار المحكمة (بيت القاضي)', 'قلعة الجبل', 'قصر عابدين'], correct: 1, exp: 'اجتمع زعماء الشعب من العلماء ونقباء الطوائف بدار المحكمة في 13 مايو 1805م وقرروا عزل خورشيد باشا وتعيين محمد علي.' },
+          { q: 'من هو القائد الفرنسي الذي استعان به محمد علي لتدريب الضباط المصريين في أسوان؟', options: ['كليبر', 'مينو', 'الكولونيل سيف (سليمان باشا الفرنساوي)', 'ديليسبس'], correct: 2, exp: 'استعان محمد علي بالكولونيل سيف وهو أحد ضباط جيش نابليون وأسلم وسُمي بسليمان باشا الفرنساوي.' }
+        ],
+        model: { hat: 'tarboosh', skin: 0xd6a374, coat: 0x1e1b4b, beard: true, mustache: false, accessory: 'sword' }
+      },
+      'selim-first': {
+        name: 'السلطان سليم الأول',
+        title: 'توسع العثمانيين في الشرق',
+        period: '1512 - 1520م',
+        era: 'العصر العثماني والمماليك',
+        icon: '🕌',
+        videoUrl: 'https://www.youtube.com/embed/6GFgMp6uIro',
+        videoTitle: 'السلطان سليم الأول ومعركة الريدانية',
+        videoSub: 'معركتا مرج دابق والريدانية وتحول مصر لولاية عثمانية.',
+        mainSpeech: 'أنا السلطان سليم الأول تاسع سلاطين بني عثمان. مع مطلع القرن السادس عشر، علمت أن الصدام مع أوروبا في الغرب محفوف بالمخاطر لتفوقهم العسكري، فوجهت بصري نحو الشرق العربي الإسلامي. خضت معركة جالديران ضد الصفويين، ثم مرج دابق 1516م ضد المماليك، وأخيراً معركة الريدانية في مصر عام 1517م.',
+        speechSummary: 'خطاب التوسع نحو الشرق ومعركتي مرج دابق والريدانية',
+        dialogues: [
+          { q: 'لماذا فضلت التوسع نحو الشرق وتجنبت الصدام مع أوروبا؟', a: 'أدركت خطورة التوسع نحو الغرب الأوروبي لتفوقهم الحضاري والعسكري على العثمانيين، ولرغبتي في تأمين حدود الدولة والسيطرة على الأراضي المقدسة ومصر قلب العالم الإسلامي.' },
+          { q: 'ماذا حدث في معركة الريدانية عام 1517م؟', a: 'التقيت بجيش المماليك بقيادة السلطان طومان باي عند صحراء الريدانية (العباسية حالياً)، وانتصرنا بفضل تفوق سلاح المدفعية والمشاة والأسلحة النارية الحديثة.' }
+        ],
+        notes: [
+          { title: 'معركة جالديران', year: '1514م', detail: 'انتصار سليم الأول على الدولة الصفوية ودخول عاصمتهم تبريز وتأمين الحدود الشرقية.' },
+          { title: 'معركة مرج دابق', year: '1516م', detail: 'الانتصار على المماليك بقيادة قنصوه الغوري في الشام، وتحولت بلاد الشام لولاية عثمانية.' },
+          { title: 'معركة الريدانية ونهاية المماليك', year: '1517م', detail: 'هزيمة طومان باي في مصر، لتنتهي دولة المماليك رسمياً وتصبح مصر ولاية عثمانية.' }
+        ],
+        quiz: [
+          { q: 'في أي معركة انتهت دولة المماليك وأصبحت مصر ولاية عثمانية عام 1517م؟', options: ['معركة جالديران', 'معركة مرج دابق', 'معركة الريدانية', 'معركة ديو البحرية'], correct: 2, exp: 'معركة الريدانية دارت في صحراء العباسية عام 1517م بين سليم الأول وطومان باي وانتهت بهزيمة المماليك.' }
+        ],
+        model: { hat: 'turban', skin: 0xc99665, coat: 0x991b1b, beard: false, mustache: true, accessory: 'scepter' }
+      },
+      'napoleon': {
+        name: 'نابليون بونابرت',
+        title: 'قائد الحملة الفرنسية على مصر',
+        period: '1798 - 1799م',
+        era: 'تاريخ مصر الحديث',
+        icon: '⚔️',
+        videoUrl: 'https://www.youtube.com/embed/QJ3EIl0bIFQ',
+        videoTitle: 'نابليون بونابرت والحملة الفرنسية على مصر',
+        videoSub: 'قائد الحملة الفرنسية على مصر وأهدافها ونتائجها العلمية والسياسية.',
+        mainSpeech: 'أنا الجنرال نابليون بونابرت. في صيف عام 1798م أبحرت بأسطولي في سرية تامة نحو مصر لقطع طريق مواصلات بريطانيا إلى الهند، وتأسيس مستعمرة فرنسية في الشرق. اصطحبت معي 146 عالماً وفناناً، وأسسنا المجمع العلمي المصري، وفك علماؤنا رموز حجر رشيد.',
+        speechSummary: 'خطاب الحملة الفرنسية ومعركة الأهرام والمجمع العلمي',
+        dialogues: [
+          { q: 'ما الأسباب الحقيقية وراء قيادتك للحملة الفرنسية على مصر؟', a: 'الهدف الاستراتيجي كان تعويض فرنسا عن فقدان مستعمراتها، وقطع طريق التجارة والمواصلات بين بريطانيا ومستعمرتها الكبرى في الهند.' },
+          { q: 'ما هي أهم الآثار العلمية لحملتك على مصر؟', a: 'أنشأت المجمع العلمي المصري لدراسة علوم البلاد، وقام علماؤنا بتأليف كتاب وصف مصر الموسوعي، واكتشاف حجر رشيد مما أتاح فك الهيروغليفية.' }
+        ],
+        notes: [
+          { title: 'موقعة أبو قير البحرية', year: '1798م', detail: 'حطم الأسطول الإنجليزي بقيادة نيلسون أسطول فرنسا في خليج أبو قير، مما حاصر الحملة داخل مصر.' },
+          { title: 'ثورة القاهرة الأولى', year: '1798م', detail: 'قاد أهالي القاهرة والأزهر الشريف ثورة عارمة ضد قوات نابليون نتيجة فرض الضرائب.' },
+          { title: 'اكتشاف حجر رشيد', year: '1799م', detail: 'أعظم كشف أثري وتاريخي ساعد العالم في فك رموز اللغة المصرية القديمة.' }
+        ],
+        quiz: [
+          { q: 'من هو القائد الإنجليزي الذي حطم الأسطول الفرنسي في موقعة أبو قير البحرية 1798م؟', options: ['نيلسون', 'ديليسبس', 'سيدني سميث', 'ويلينغتون'], correct: 0, exp: 'القائد الإنجليزي نيلسون دمر الأسطول الفرنسي في خليج أبو قير بالإسكندرية في أغسطس 1798م.' }
+        ],
+        model: { hat: 'bicorne', skin: 0xf1c27d, coat: 0x1d4ed8, beard: false, mustache: false, accessory: 'telescope' }
+      }
+    };
+
+    let currentFigureId = 'mohamed-ali';
+    let isSpeaking = false;
+    let isFlipping = false;
+    let flipProgress = 0;
+    let currentSpeechText = charactersData['mohamed-ali'].mainSpeech;
+
+    // متغيرات Three.js
+    let scene, camera, renderer, controls;
+    let charGroup, jawMesh, headGroup, rightArmGroup;
+
+    // مؤثرات صوتية فيزيائية برمجية
+    let audioCtx = null;
+    function playWhoosh() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(700, now + 0.15);
+        osc.frequency.exponentialRampToValueAtTime(80, now + 0.45);
+        gain.gain.setValueAtTime(0.01, now);
+        gain.gain.linearRampToValueAtTime(0.2, now + 0.1);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.46);
+      } catch (e) {}
+    }
+
+    function playFanfare() {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const now = audioCtx.currentTime;
+        [261.63, 329.63, 392.00, 523.25].forEach((freq, idx) => {
+          const start = now + idx * 0.08;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, start);
+          gain.gain.setValueAtTime(0, start);
+          gain.gain.linearRampToValueAtTime(0.12, start + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, start + 0.35);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(start);
+          osc.stop(start + 0.36);
+        });
+      } catch (e) {}
+    }
+
+    // تهيئة مشهد Three.js
+    function initThree() {
+      const container = document.getElementById('threeCanvasContainer');
+      const width = container.clientWidth || 600;
+      const height = container.clientHeight || 450;
+
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0f172a);
+      scene.fog = new THREE.FogExp2(0x0f172a, 0.05);
+
+      camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 50);
+      camera.position.set(0, 1.35, 4.2);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.outputEncoding = THREE.sRGBEncoding;
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+      container.appendChild(renderer.domElement);
+
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.06;
+      controls.target.set(0, 1.05, 0);
+      controls.minDistance = 1.8;
+      controls.maxDistance = 6.5;
+
+      // الإضاءة
+      const keyLight = new THREE.DirectionalLight(0xfff3e0, 2.4);
+      keyLight.position.set(3, 4, 3.5);
+      keyLight.castShadow = true;
+      scene.add(keyLight);
+
+      const fillLight = new THREE.DirectionalLight(0xa5b4fc, 1.2);
+      fillLight.position.set(-3.5, 2.5, -2);
+      scene.add(fillLight);
+
+      const hemiLight = new THREE.HemisphereLight(0x6366f1, 0x1e1b4b, 0.85);
+      scene.add(hemiLight);
+
+      // منصة الارتكاز الذهبية
+      const pedestalGroup = new THREE.Group();
+      const pedMesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(1.6, 1.75, 0.15, 36),
+        new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.6, roughness: 0.3 })
+      );
+      pedMesh.position.y = -0.075;
+      pedMesh.receiveShadow = true;
+      pedestalGroup.add(pedMesh);
+
+      const ringMesh = new THREE.Mesh(
+        new THREE.TorusGeometry(1.62, 0.035, 16, 48),
+        new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.9, roughness: 0.2 })
+      );
+      ringMesh.rotation.x = Math.PI / 2;
+      ringMesh.position.y = 0.005;
+      pedestalGroup.add(ringMesh);
+      scene.add(pedestalGroup);
+
+
+      // حلقة التحريك
+      let lastTime = performance.now();
+      let elapsedTime = 0;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const now = performance.now();
+        const delta = Math.min((now - lastTime) / 1000, 0.1);
+        lastTime = now;
+        elapsedTime += delta;
+
+        controls.update();
+
+        // تنفس وتمايل الشخصية
+        if (charGroup) {
+          charGroup.position.y = Math.sin(elapsedTime * 2) * 0.015;
+        }
+
+        // حركة الفم والأيدي أثناء الكلام
+        if (isSpeaking) {
+          if (jawMesh) {
+            const jawOpen = Math.abs(Math.sin(elapsedTime * 14)) * 0.05 + Math.sin(elapsedTime * 7) * 0.02;
+            jawMesh.position.y = 0.015 - jawOpen;
+          }
+          if (headGroup) {
+            headGroup.rotation.x = Math.sin(elapsedTime * 3.5) * 0.06;
+            headGroup.rotation.y = Math.sin(elapsedTime * 2.2) * 0.08;
+          }
+          if (rightArmGroup) {
+            rightArmGroup.rotation.x = -0.5 + Math.sin(elapsedTime * 3) * 0.25;
+          }
+        } else {
+          if (jawMesh) jawMesh.position.y = 0.015;
+          if (headGroup) {
+            headGroup.rotation.x *= 0.9;
+            headGroup.rotation.y *= 0.9;
+          }
+          if (rightArmGroup && !isFlipping) {
+            rightArmGroup.rotation.x *= 0.9;
+          }
+        }
+
+        // حركة الشقلبة 360°
+        if (isFlipping && charGroup) {
+          flipProgress += delta * 2.8;
+          charGroup.rotation.x = flipProgress * Math.PI * 2;
+          charGroup.position.y = Math.sin(flipProgress * Math.PI) * 0.65;
+          if (flipProgress >= 1) {
+            isFlipping = false;
+            charGroup.rotation.x = 0;
+            charGroup.position.y = 0;
+          }
+        }
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        if (!container || !renderer || !camera) return;
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+      });
+    }
+
+    // تحميل المجسم ثلاثي الأبعاد المرفق لمحمد علي باشا
+    function buildCharacterModel() {
+      if (charGroup) scene.remove(charGroup);
+      charGroup = new THREE.Group();
+      scene.add(charGroup);
+      jawMesh = headGroup = rightArmGroup = null;
+      const loadingMessage = document.getElementById('modelLoadingMessage');
+      if (loadingMessage) { loadingMessage.style.display = 'flex'; loadingMessage.textContent = 'جارٍ تحميل مجسم محمد علي باشا...'; }
+      new THREE.GLTFLoader().load('./mohamed-ali.glb', (gltf) => {
+        const model = gltf.scene;
+        const bounds = new THREE.Box3().setFromObject(model);
+        const size = bounds.getSize(new THREE.Vector3());
+        const center = bounds.getCenter(new THREE.Vector3());
+        const scale = 3 / (Math.max(size.x, size.y, size.z) || 1);
+        model.scale.setScalar(scale);
+        model.position.set(-center.x * scale, -bounds.min.y * scale, -center.z * scale);
+        model.traverse((node) => { if (node.isMesh) { node.castShadow = true; node.receiveShadow = true; } });
+        charGroup.add(model);
+        if (loadingMessage) loadingMessage.style.display = 'none';
+        resetCamera();
+      }, undefined, (error) => {
+        console.error('تعذر تحميل المجسم:', error);
+        if (loadingMessage) loadingMessage.textContent = 'تعذر تحميل المجسم. ضع ملف mohamed-ali.glb بجوار صفحة HTML.';
+      });
+    }
+
+    // دوال التحكم والتفاعل
+    function rotateCharacter(angle) {
+      if (!controls || !camera) return;
+      const spherical = new THREE.Spherical();
+      spherical.setFromVector3(camera.position.clone().sub(controls.target));
+      spherical.theta += angle;
+      camera.position.copy(new THREE.Vector3().setFromSpherical(spherical).add(controls.target));
+      controls.update();
+    }
+
+    function triggerFlip() {
+      if (!isFlipping) {
+        isFlipping = true;
+        flipProgress = 0;
+        playWhoosh();
+      }
+    }
+
+    function triggerSalute() {
+      if (!charGroup) return;
+      const start = charGroup.rotation.z;
+      const beganAt = performance.now();
+      function greet(now) {
+        if (!charGroup) return;
+        const progress = Math.min((now - beganAt) / 900, 1);
+        charGroup.rotation.z = start + Math.sin(progress * Math.PI * 2) * (1 - progress) * 0.16;
+        if (progress < 1) requestAnimationFrame(greet);
+        else charGroup.rotation.z = start;
+      }
+      requestAnimationFrame(greet);
+    }
+
+    function resetCamera() {
+      if (camera && controls) {
+        camera.position.set(0, 1.35, 4.2);
+        controls.target.set(0, 1.05, 0);
+        controls.update();
+      }
+      if (charGroup) charGroup.rotation.set(0, 0, 0);
+    }
+
+    function setCameraView(view) {
+      if (!camera || !controls) return;
+      if (view === 'face') {
+        camera.position.set(0, 1.62, 1.9);
+        controls.target.set(0, 1.58, 0);
+      } else if (view === 'body') {
+        camera.position.set(0, 1.35, 4.2);
+        controls.target.set(0, 1.05, 0);
+      } else if (view === 'top') {
+        camera.position.set(0, 3.8, 2.5);
+        controls.target.set(0, 1.05, 0);
+      }
+      controls.update();
+    }
+
+    // الصوت والكلام (Web Speech API)
+    function stopSpeech() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      isSpeaking = false;
+      document.getElementById('speakingIndicatorDot').classList.remove('animate-ping');
+      document.getElementById('speakingIndicatorText').innerText = 'صوت الشخصية التاريخية';
+      document.getElementById('btnPlayVoice').innerText = '▶';
+    }
+
+    function playSpeech(text) {
+      stopSpeech();
+      currentSpeechText = text;
+      document.getElementById('speechBubbleText').innerText = `"${text}"`;
+
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ar-SA';
+        utterance.rate = 1.0;
+        
+        utterance.onstart = () => {
+          isSpeaking = true;
+          document.getElementById('speakingIndicatorDot').classList.add('animate-ping');
+          document.getElementById('speakingIndicatorText').innerText = 'يتحدث الآن...';
+          document.getElementById('btnPlayVoice').innerText = '⏸';
+        };
+
+        utterance.onend = utterance.onerror = () => {
+          stopSpeech();
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } else {
+        isSpeaking = true;
+        document.getElementById('btnPlayVoice').innerText = '⏸';
+        setTimeout(stopSpeech, 6000);
+      }
+    }
+
+    function togglePlaySpeech() {
+      if (isSpeaking) {
+        stopSpeech();
+      } else {
+        playSpeech(currentSpeechText);
+      }
+    }
+
+    function playMainSpeech() {
+      playFanfare();
+      playSpeech(charactersData[currentFigureId].mainSpeech);
+    }
+
+    // تبديل الشخصية وتحديث المحتوى والفيديو
+    function switchCharacter(id) {
+      if (!charactersData[id]) return;
+      currentFigureId = id;
+      const data = charactersData[id];
+
+      // تحديث الأزرار النشطة
+      document.querySelectorAll('.char-tab-btn').forEach(btn => {
+        btn.className = 'char-tab-btn px-3 py-1.5 rounded-xl text-xs font-black transition-all bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center gap-1';
+      });
+      const activeBtn = document.getElementById('btn-char-' + id);
+      if (activeBtn) {
+        activeBtn.className = 'char-tab-btn px-3 py-1.5 rounded-xl text-xs font-black transition-all bg-purple-600 text-white shadow-sm flex items-center gap-1';
+      }
+
+      // تحديث العناوين والشارات
+      document.getElementById('activeCharacterTitle').innerText = 'الشخصية ثلاثية الأبعاد (3D): ' + data.name;
+      document.getElementById('activeCharacterEra').innerText = data.era;
+      document.getElementById('charIconBadge').innerText = data.icon;
+      document.getElementById('charNameBadge').innerText = data.name;
+      document.getElementById('charPeriodBadge').innerText = data.period;
+      document.getElementById('panelTitle').innerText = 'حوار وتفاعل مع ' + data.name;
+      document.getElementById('panelSpeechSummary').innerText = data.speechSummary;
+
+      // تحديث الفيديو
+      document.getElementById('videoTitleDisplay').innerText = data.videoTitle;
+      document.getElementById('videoSubDisplay').innerText = data.videoSub;
+      document.getElementById('videoIframe').src = data.videoUrl;
+
+      // تحديث الأسئلة
+      const qContainer = document.getElementById('questionsContainer');
+      qContainer.innerHTML = '';
+      data.dialogues.forEach(d => {
+        const btn = document.createElement('button');
+        btn.className = 'w-full text-right p-2.5 rounded-xl border border-slate-700/60 bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-bold transition-all flex items-start gap-2';
+        btn.innerHTML = `<span class="text-purple-400 mt-0.5">💬</span><span>${d.q}</span>`;
+        btn.onclick = () => playSpeech(d.a);
+        qContainer.appendChild(btn);
+      });
+
+      // تحديث ملخص المنهج
+      const notesContainer = document.getElementById('notesContainer');
+      notesContainer.innerHTML = '';
+      data.notes.forEach(n => {
+        const card = document.createElement('div');
+        card.className = 'bg-slate-50 rounded-2xl p-3.5 border border-slate-200/60 space-y-1';
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-black text-purple-700">${n.title}</span>
+            <span class="text-[10px] bg-purple-100 text-purple-800 px-2 py-0.5 rounded-md font-bold">${n.year}</span>
+          </div>
+          <p class="text-[11px] text-slate-600 font-semibold leading-relaxed">${n.detail}</p>
+        `;
+        notesContainer.appendChild(card);
+      });
+
+      // تحديث أسئلة اختبر فهمك
+      const quizContainer = document.getElementById('quizContainer');
+      quizContainer.innerHTML = '';
+      data.quiz.forEach((qz, qIdx) => {
+        const qBox = document.createElement('div');
+        qBox.className = 'bg-purple-50/50 rounded-2xl p-4 border border-purple-100 space-y-3';
+        qBox.innerHTML = `
+          <p class="text-xs sm:text-sm font-black text-slate-800">
+            <span class="text-purple-600 ml-1">س ${qIdx + 1}:</span> ${qz.q}
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="q-options-${qIdx}"></div>
+          <div id="q-exp-${qIdx}" class="hidden p-2.5 rounded-xl bg-white border border-purple-200/80 text-[11px] font-semibold text-slate-600 leading-relaxed">
+            💡 <span class="font-bold text-purple-700">التوضيح: </span> ${qz.exp}
+          </div>
+        `;
+        quizContainer.appendChild(qBox);
+
+        const optsBox = qBox.querySelector(`#q-options-${qIdx}`);
+        qz.options.forEach((opt, optIdx) => {
+          const optBtn = document.createElement('button');
+          optBtn.className = 'p-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold text-right transition-all flex items-center justify-between';
+          optBtn.innerText = opt;
+          optBtn.onclick = () => {
+            const expDiv = document.getElementById(`q-exp-${qIdx}`);
+            expDiv.classList.remove('hidden');
+            const allBtns = optsBox.querySelectorAll('button');
+            allBtns.forEach((b, idx) => {
+              b.disabled = true;
+              if (idx === qz.correct) {
+                b.className = 'p-2.5 rounded-xl border border-emerald-600 bg-emerald-500 text-white text-xs font-bold text-right flex items-center justify-between';
+                b.innerHTML = `<span>${b.innerText}</span><span>✓</span>`;
+              } else if (idx === optIdx && optIdx !== qz.correct) {
+                b.className = 'p-2.5 rounded-xl border border-rose-600 bg-rose-500 text-white text-xs font-bold text-right flex items-center justify-between';
+                b.innerHTML = `<span>${b.innerText}</span><span>✗</span>`;
+              }
+            });
+            if (optIdx === qz.correct && typeof confetti === 'function') {
+              confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+            }
+          };
+          optsBox.appendChild(optBtn);
+        });
+      });
+
+      // إعادة بناء المجسم 3D
+      buildCharacterModel(data.model);
+      playMainSpeech();
+    }
+
+    // تصفية العصور في شبكة البطاقات
+    function filterEra(era) {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.className = 'filter-btn px-3.5 py-1.5 rounded-xl text-slate-600 hover:bg-slate-100';
+      });
+      const activeBtn = document.getElementById('filter-' + era);
+      if (activeBtn) activeBtn.className = 'filter-btn px-3.5 py-1.5 rounded-xl bg-purple-600 text-white shadow-xs';
+
+      document.querySelectorAll('.card-item').forEach(card => {
+        if (era === 'all' || card.classList.contains(era)) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    // تشغيل عند تحميل الصفحة
+    window.addEventListener('DOMContentLoaded', () => {
+      initThree();
+      switchCharacter('mohamed-ali');
+    });
+  </script>
+</body>
+</html>
