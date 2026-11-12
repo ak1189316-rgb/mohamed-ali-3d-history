@@ -720,7 +720,7 @@
       jawMesh = headGroup = rightArmGroup = null;
       const loadingMessage = document.getElementById('modelLoadingMessage');
       if (loadingMessage) { loadingMessage.style.display = 'flex'; loadingMessage.textContent = 'جارٍ تحميل مجسم محمد علي باشا...'; }
-      new THREE.GLTFLoader().load('./mohamed-ali.glb', (gltf) => {
+      new THREE.GLTFLoader().load('./mohamed-ali-optimized.glb', (gltf) => {
         const model = gltf.scene;
         const bounds = new THREE.Box3().setFromObject(model);
         const size = bounds.getSize(new THREE.Vector3());
@@ -734,7 +734,7 @@
         resetCamera();
       }, undefined, (error) => {
         console.error('تعذر تحميل المجسم:', error);
-        if (loadingMessage) loadingMessage.textContent = 'تعذر تحميل المجسم. ضع ملف mohamed-ali.glb بجوار صفحة HTML.';
+        if (loadingMessage) loadingMessage.textContent = 'تعذر تحميل المجسم. ضع ملف mohamed-ali-optimized.glb بجوار صفحة HTML.';
       });
     }
 
