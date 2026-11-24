@@ -42,33 +42,16 @@ nav a.on{background:var(--copper);color:#2a150b}
 
 
 /* ===== Sub bar + back button + title (مطابق لصفحات الأنشطة) ===== */
-.subbar{background:var(--bg2);border-bottom:1px solid var(--line)}
-.subbar .in{max-width:1240px;margin:auto;padding:8px 20px;display:flex;justify-content:flex-start}
-.pill{background:var(--copper);color:#2a150b;font-weight:700;font-size:.88rem;padding:4px 22px;border-radius:99px}
 .backrow{padding:20px 0 0;display:flex;justify-content:flex-start}
 .back{display:inline-flex;align-items:center;gap:10px;padding:8px 24px;border-radius:99px;border:1px solid var(--copper);color:var(--sand);font-weight:700;font-size:.92rem;background:rgba(200,130,90,.06);transition:.3s}
 .back:hover{background:var(--copper);color:#2a150b;transform:translateX(4px)}
-.title{display:flex;align-items:center;gap:18px;padding:18px 0 4px}
+.title{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:18px 0 4px}
+.title::before{content:"";position:absolute;left:50%;top:50%;width:min(680px,92%);height:200px;transform:translate(-50%,-50%);background:radial-gradient(ellipse at center,rgba(240,180,76,.22) 0%,rgba(200,130,90,.10) 45%,transparent 72%);z-index:-1;pointer-events:none}
 .title .ic{border-radius:18px;width:62px;height:62px;border:1px solid var(--copper);display:grid;place-items:center;font-size:1.8rem;background:rgba(200,130,90,.12);transform:rotate(45deg);flex-shrink:0;margin:8px}
 .title .ic i{transform:rotate(-45deg);font-style:normal}
 .title h1{font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:clamp(1.8rem,4.6vw,3rem);line-height:1.4;color:var(--sand)}
-.title p{color:var(--mute);font-size:.95rem}
+.title p{color:var(--mute);font-size:.95rem;max-width:640px;margin:0 auto}
 
-/* ===== خلفية متحركة خفيفة ===== */
-.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.wrap,footer,.strip{position:relative;z-index:1}
-.orb{position:absolute;border-radius:50%;filter:blur(70px);opacity:.28}
-.o1{width:420px;height:420px;background:#c8825a;top:8%;right:-120px;animation:drift 16s ease-in-out infinite}
-.o2{width:360px;height:360px;background:#f0b44c;bottom:5%;left:-110px;animation:drift 20s ease-in-out infinite reverse}
-@keyframes drift{50%{transform:translate(-50px,40px) scale(1.12)}}
-.pyr{position:absolute;opacity:.12;animation:breathe 7s ease-in-out infinite}
-.p1{width:300px;bottom:6%;right:3%}
-.p2{width:200px;bottom:10%;left:5%;animation-delay:2s}
-@keyframes breathe{50%{opacity:.22;transform:translateY(-8px)}}
-.fl{position:absolute;bottom:-60px;opacity:0;animation:rise linear infinite;filter:drop-shadow(0 0 6px rgba(240,180,76,.4))}
-@keyframes rise{0%{transform:translateY(0) rotate(0);opacity:0}12%{opacity:.35}88%{opacity:.3}100%{transform:translateY(-115vh) rotate(25deg);opacity:0}}
-.dust{position:absolute;width:4px;height:4px;border-radius:50%;background:var(--gold);opacity:0;animation:twinkle ease-in-out infinite}
-@keyframes twinkle{50%{opacity:.7;transform:scale(1.8)}}
 
 /* ===== Page title ===== */
 .wrap{max-width:1240px;margin:auto;padding:0 20px}
@@ -176,12 +159,6 @@ footer{background:#24130b;text-align:center;padding:26px 16px;color:var(--mute);
     <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEzagK-_Zmqbzw25mmC78SZwqlNOLOK24tSfODSl1WydvvBxkharGt-Mmz&s=10" alt="شعار كلية التربية النوعية وقسم تكنولوجيا التعليم">
   </div>
 </header>
-<div class="subbar"><div class="in"><span class="pill">محاكاة الشخصيات</span></div></div>
-<div class="bgfx" id="bgfx" aria-hidden="true">
-  <i class="orb o1"></i><i class="orb o2"></i>
-  <svg class="pyr p1" viewBox="0 0 200 120"><polygon points="10,115 100,10 190,115" fill="none" stroke="#f0b44c" stroke-width="2"/><path d="M40 80H160M62 55H138M82 33H118" stroke="#f0b44c" stroke-width="1.5" fill="none"/></svg>
-  <svg class="pyr p2" viewBox="0 0 200 120"><polygon points="10,115 100,10 190,115" fill="none" stroke="#c8825a" stroke-width="2"/><path d="M40 80H160M62 55H138M82 33H118" stroke="#c8825a" stroke-width="1.5" fill="none"/></svg>
-</div>
 
 
 <main class="wrap">
@@ -669,32 +646,6 @@ function renderQuiz() {
   });
 }
 
-
-// عناصر الخلفية الخفيفة
-(function(){
-  var fx = document.getElementById('bgfx');
-  if (!fx || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  var icons = ['🏺','📜','🗺️','⚔️','👑','🧭','🏛️'];
-  for (var i = 0; i < 9; i++) {
-    var e = document.createElement('span');
-    e.className = 'fl';
-    e.textContent = icons[i % icons.length];
-    e.style.left = (Math.random() * 94 + 2) + '%';
-    e.style.fontSize = (18 + Math.random() * 18) + 'px';
-    e.style.animationDuration = (22 + Math.random() * 20) + 's';
-    e.style.animationDelay = (-Math.random() * 30) + 's';
-    fx.appendChild(e);
-  }
-  for (var j = 0; j < 26; j++) {
-    var d = document.createElement('span');
-    d.className = 'dust';
-    d.style.left = (Math.random() * 100) + '%';
-    d.style.top = (Math.random() * 100) + '%';
-    d.style.animationDuration = (3 + Math.random() * 5) + 's';
-    d.style.animationDelay = (-Math.random() * 6) + 's';
-    fx.appendChild(d);
-  }
-})();
 
 window.addEventListener('DOMContentLoaded', () => {
   renderDialogues();
